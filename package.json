@@ -1,0 +1,42 @@
+{
+  "name": "matrix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/api/index.js",
+    "dev": "env-cmd -f ./env/dev.env nodemon services/api/index.js",
+    "test": "env-cmd ./env/test.env jest --watch --runInBand"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoinLabs/matrix.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SoinLabs/matrix/issues"
+  },
+  "homepage": "https://github.com/SoinLabs/matrix#readme",
+  "dependencies": {
+    "@soinlabs/db": "^0.0.6",
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.5.1",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "mongodb": "^4.1.0",
+    "mongoose": "^5.13.5",
+    "node-fetch": "^2.6.1",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
+    "qrcode": "^1.4.4",
+    "sequelize": "^6.6.5",
+    "standard-error": "^1.1.0",
+    "validator": "^13.6.0"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "nodemon": "^2.0.12"
+  }
+}
