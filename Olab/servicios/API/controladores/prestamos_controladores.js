@@ -48,4 +48,16 @@ let ObtenerPrestamos = async (req,res)=>{
         res.status(400).json('Hay un problema para obtener los prestamos del usuario');
     }
 }
-module.exports={ingresoPrestamo,ObtenerPrestamos};
+
+let Prestamo = async (request,res)=>{
+    const idprestamo = request.params.id;
+    try{
+        const consulta = await pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'`);
+        res.status(200).json(consulta.rows);
+    }catch(error){
+        console.log(error);
+        res.json('Hubo un error para obtener la información');
+    }
+}
+
+module.exports={ingresoPrestamo,ObtenerPrestamos,Prestamo};
