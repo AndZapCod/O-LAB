@@ -1,7 +1,7 @@
 const pool = require('../../../paquetes/base_datos/DB_conexion');
 
 let ingresoPrestamo = async (req,res)=>{
-    const {documento,elementos}=req.body;
+    const {elementos}=req.body;
     try{
         let query='SELECT serial,disponibles FROM inventario WHERE serial IN (';
         for(let i=0;i<elementos.length-1;i++){
@@ -16,7 +16,7 @@ let ingresoPrestamo = async (req,res)=>{
         }
         const resp2= await pool.query('SELECT count(*) AS num_prestamos FROM prestamo');
         const idd='PRE-'+(parseInt(resp2.rows[0].num_prestamos)+1);
-        const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',${documento},now()::date,
+        const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
                                        now()::date+3,now()::date+15,5)`);
         let query2='INSERT INTO prestamo_inv VALUES '
         for(let j=0;j<elementos.length;j++){
@@ -39,9 +39,9 @@ let ingresoPrestamo = async (req,res)=>{
 }
 
 let ObtenerPrestamos = async (req,res)=>{
-    const doc=req.params.documento;
+    const doc=req.usuarioCorreo;
     try{
-        const resp= await pool.query(`SELECT * FROM prestamo WHERE documento=${doc}`);
+        const resp= await pool.query(`SELECT * FROM prestamo WHERE correo_usuario=\'${doc}\'`);
         res.status(200).json(resp.rows);
     }catch(error){
         console.log(error);

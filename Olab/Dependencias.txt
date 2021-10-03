@@ -1,0 +1,5 @@
+express
+pg
+generate-password
+jsonwebtoken
+bcrypt
