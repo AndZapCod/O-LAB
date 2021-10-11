@@ -1,11 +1,10 @@
 {
   "name": "matrix",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node src/api/index.js",
-    "dev": "env-cmd -f ./env/dev.env nodemon services/api/index.js",
+    "dev": "nodemon Olab/servicios/API/index.js",
     "test": "env-cmd ./env/test.env jest --watch --runInBand"
   },
   "repository": {
@@ -20,9 +19,11 @@
   "homepage": "https://github.com/SoinLabs/matrix#readme",
   "dependencies": {
     "@soinlabs/db": "^0.0.6",
+    "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.1",
-    "express": "^4.16.4",
+    "express": "^4.17.1",
+    "generate-password": "^1.6.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongodb": "^4.1.0",
@@ -37,6 +38,8 @@
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
-    "nodemon": "^2.0.12"
-  }
+    "nodemon": "^2.0.13"
+  },
+  "keywords": [],
+  "description": ""
 }
