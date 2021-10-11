@@ -2,7 +2,7 @@ const pool = require('../../../paquetes/base_datos/DB_conexion');
 
 const consultarKits = async (req, res) => {
     try{
-        const response = await pool.query('SELECT * FROM kits');
+        const response = await pool.query('SELECT * FROM inventario WHERE tipo = \'kit\';');
         res.status(200).json(response.rows);
     }catch(e){
         console.log(e)
@@ -13,7 +13,7 @@ const consultarKits = async (req, res) => {
 const consultarKit = async (req, res) => {
     try{
         const kit_id = req.params.id;
-        const response = await pool.query(`SELECT * FROM kits WHERE kit_id = \'${kit_id}\';`);
+        const response = await pool.query(`SELECT * FROM inventario WHERE serial = \'${kit_id}\';`);
         res.status(200).json(response.rows)
     }catch(e){
         console.log(e);
