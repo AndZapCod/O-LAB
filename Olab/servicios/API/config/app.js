@@ -14,5 +14,5 @@ app.use(express.urlencoded({ extended: true }));
 //router
 app.use('/prestamos',RouterPres);
 app.use('/auth',RouterAuth);
-app.use('/kits/', RouterKits);
+app.use('/kits', RouterKits);
 module.exports=app;
