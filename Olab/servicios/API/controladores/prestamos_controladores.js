@@ -1,6 +1,6 @@
 const pool = require('../../../paquetes/base_datos/DB_conexion');
 
-let ingresoPrestamo = async (req,res)=>{
+let ingresoReserva = async (req,res)=>{
     const {elementos}=req.body;
     try{
         let query='SELECT serial,disponibles FROM inventario WHERE serial IN (';
@@ -17,7 +17,7 @@ let ingresoPrestamo = async (req,res)=>{
         const resp2= await pool.query('SELECT count(*) AS num_prestamos FROM prestamo');
         const idd='PRE-'+(parseInt(resp2.rows[0].num_prestamos)+1);
         const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
-                                       now()::date+3,now()::date+15,5)`);
+                                       now()::date+3,now()::date+15,5,'TRUE')`);
         let query2='INSERT INTO prestamo_inv VALUES '
         for(let j=0;j<elementos.length;j++){
             if(j!==elementos.length-1){
@@ -31,28 +31,37 @@ let ingresoPrestamo = async (req,res)=>{
             const resp5 = await pool.query(`UPDATE inventario SET disponibles=${resp.rows[i].disponibles-elementos[i][1]}
             WHERE serial=\'${elementos[i][0]}\'`);
         }
-        res.status(200).json(`Prestamo ${idd} confirmado`);
+        res.status(200).json(`Reserva No. ${idd} creada`);
     }catch(error){
         console.log(error);
-        res.status(400).json('Hay un problema para insertar el prestamo');
+        res.status(400).json('Hay un problema para crear la reserva');
     }
 }
 
-let ObtenerPrestamos = async (req,res)=>{
-    const doc=req.usuarioCorreo;
+let ObtenerReservas = async (req,res)=>{
     try{
-        const resp= await pool.query(`SELECT * FROM prestamo WHERE correo_usuario=\'${doc}\'`);
+        const resp= await pool.query(`SELECT p.prestamo_id, CONCAT(u.nombre,' ',u.apellido1) nombre,u.posicion,
+                                    u.correo,p.entrega FROM
+                                    usuarios AS u JOIN prestamo AS p ON (u.correo=p.correo_usuario)
+                                    WHERE p.en_reserva=TRUE`);
         res.status(200).json(resp.rows);
     }catch(error){
         console.log(error);
-        res.status(400).json('Hay un problema para obtener los prestamos del usuario');
+        res.status(400).json('Hay un problema para obtener las reservas de los usuarios');
     }
 }
 
-let Prestamo = async (request,res)=>{
+let Reserva = async (request,res)=>{
     const idprestamo = request.params.id;
     try{
-        const consulta = await pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'`);
+        const chequeo =await pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'
+                                        AND en_reserva=TRUE`);
+        if(chequeo.rowCount===0){
+            return res.status(404).json('No hay reserva con ese id')
+        }
+        const consulta = await pool.query(`SELECT pi.serial,i.categoria,i.ubicacion,pi.cantidad 
+                                            FROM prestamo_inv AS pi JOIN inventario AS i 
+                                            ON (pi.serial=i.serial) WHERE pi.prestamo_id=\'${idprestamo}\'`);
         res.status(200).json(consulta.rows);
     }catch(error){
         console.log(error);
@@ -60,4 +69,4 @@ let Prestamo = async (request,res)=>{
     }
 }
 
-module.exports={ingresoPrestamo,ObtenerPrestamos,Prestamo};
+module.exports={ingresoReserva,ObtenerReservas,Reserva};

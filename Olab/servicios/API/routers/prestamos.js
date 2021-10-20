@@ -1,15 +1,24 @@
 const {Router} = require('express');
 const router = Router();
 const pool = require('../../../paquetes/base_datos/DB_conexion');
-const {ingresoPrestamo,ObtenerPrestamos,Prestamo}= require('../controladores/prestamos_controladores');
+const {ingresoReserva,ObtenerReservas,Reserva}= require('../controladores/prestamos_controladores');
 const {estaLogueado,esAuxiliar}= require('../middlewares/auth')
-//ruta para ingresar un prestamo
-router.post('/ingresarPrestamo',estaLogueado,ingresoPrestamo);
+//ruta para crear una reserva (cliente)
+router.post('/crearReserva',estaLogueado,ingresoReserva);
 
-//ruta para obtener los prestamos de un usuario
-router.get('/estadoPrestamos',[estaLogueado,esAuxiliar],ObtenerPrestamos)
+//ruta para obtener los prestamos de todos los usuarios (auxiliar)
+router.get('/estadoReservas',[estaLogueado,esAuxiliar],ObtenerReservas)
 
-router.get('/prestamoxid/:id',Prestamo)
+//ruta para obtener los elementos de una reserva en particular (auxiliar)
+router.get('/reservaxid/:id',[estaLogueado,esAuxiliar],Reserva)
 
+//ruta para eliminar una reserva (auxiliar)
+
+
+//ruta para confirmar una reserva como prestamo (se entregan los elementos) (auxiliar)
+
+//ruta para consultar prestamos/reservar de un usuario (cliente-usa token)
+
+//ruta para devolver un prestamo (cliente-usa token)
 
 module.exports=router;

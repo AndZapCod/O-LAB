@@ -33,15 +33,15 @@ let login = async(req,res)=>{
 let registroU = async (req,res)=>{
     resultado = []
     try{
-        let consulta = 'INSERT INTO usuarios (correo,nombre,apellido1,contrasenia,rol) VALUES (';
+        let consulta = 'INSERT INTO usuarios (correo,nombre,apellido1,contrasenia,rol,posicion) VALUES (';
         for(let i=0;i<req.body.length;i++){
-            const {correo,nombre,apellido1,rol}=req.body[i]
+            const {correo,nombre,apellido1,rol,posicion}=req.body[i]
             const contrasenia = generator.generate({length:10,numbers:true});
             const hashC = await hashearContrasenia(contrasenia);
             if(i!==req.body.length-1){
-                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\'),('
+                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\',\''+posicion+'\'),('
             }else{
-                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\')'
+                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\',\''+posicion+'\')'
             }
             let objeto = {usuario:correo,contrasenia: contrasenia}
             resultado.push(objeto)
@@ -55,18 +55,16 @@ let registroU = async (req,res)=>{
 }
 
 let cambioC = async (req,res)=>{
-    const token = req.headers['token-acceso']
-    const decodificar = jwtoken.verify(token,codigo.SECRETO);
     const Ncontrasenia = req.body.nuevaContrasenia;
     const Vcontrasenia = req.body.antiguaContrasenia;
     try{
-        const consulta = pool.query(`SELECT contrasenia FROM usuarios
-        WHERE correo=\'${decodificar.correo}\'`)
-        const bool = await compararContrasenia(consulta.rows[0].constrasenia,Vcontrasenia);
+        const consulta = await pool.query(`SELECT contrasenia FROM usuarios
+        WHERE correo=\'${req.usuarioCorreo}\'`);
+        const bool = await compararContrasenia(Vcontrasenia,consulta.rows[0].contrasenia);
         if(bool){
             const HNcont = await hashearContrasenia(Ncontrasenia);
             const insercion = pool.query(`UPDATE usuarios SET contrasenia=\'${HNcont}\'
-                                         WHERE correo=\'${decodificar.correo}\'`);
+                                         WHERE correo=\'${req.usuarioCorreo}\'`);
             res.status(200).json('Contraseña actualizada correctamente');
         }else{
             res.status(400).json('Contraseña incorrecta')
