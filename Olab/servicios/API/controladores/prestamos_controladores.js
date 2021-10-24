@@ -1,3 +1,4 @@
+const { Pool } = require('pg');
 const pool = require('../../../paquetes/base_datos/DB_conexion');
 
 let ingresoReserva = async (req,res)=>{
@@ -69,4 +70,22 @@ let Reserva = async (request,res)=>{
     }
 }
 
-module.exports={ingresoReserva,ObtenerReservas,Reserva};
+let retiroPrestamo = async (req, res) => {
+    const idprestamo = request.params.id;
+    try {
+        const chequeo = await Pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'
+        AND en_reserva=FALSE`);
+
+        if (chequeo.rowCount === 0) {
+            res.status(404).json('No hay un prestamo con ese id');
+        }
+        else {
+            res.status(200).json('Si hay un prestamo con ese id')
+        }
+    }
+    catch(error) {
+        console.log(error)
+    }
+}
+
+module.exports={ingresoReserva,ObtenerReservas,Reserva, retiroPrestamo};

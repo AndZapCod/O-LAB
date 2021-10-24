@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const router = Router();
 const pool = require('../../../paquetes/base_datos/DB_conexion');
-const {ingresoReserva,ObtenerReservas,Reserva}= require('../controladores/prestamos_controladores');
+const {ingresoReserva,ObtenerReservas,Reserva, retiroPrestamo}= require('../controladores/prestamos_controladores');
 const {estaLogueado,esAuxiliar}= require('../middlewares/auth')
 //ruta para crear una reserva (cliente)
 router.post('/crearReserva',estaLogueado,ingresoReserva);
@@ -20,5 +20,6 @@ router.get('/reservaxid/:id',[estaLogueado,esAuxiliar],Reserva)
 //ruta para consultar prestamos/reservar de un usuario (cliente-usa token)
 
 //ruta para devolver un prestamo (cliente-usa token)
+router.post('/devolverPrestamo/:id', estaLogueado, retiroPrestamo)
 
 module.exports=router;
