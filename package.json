@@ -1,22 +1,22 @@
 {
-  "name": "matrix",
+  "name": "@o-lab/backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "start": "node Olab/servicios/API/index.js",
     "dev": "nodemon Olab/servicios/API/index.js",
-    "test": "mocha"
+    "test": "mocha -b"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SoinLabs/matrix.git"
+    "url": "git+https://github.com/AndZapCod/O-LAB"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SoinLabs/matrix/issues"
+    "url": "https://github.com/AndZapCod/O-LAB/issues"
   },
-  "homepage": "https://github.com/SoinLabs/matrix#readme",
+  "homepage": "https://github.com/AndZapCod/O-LAB#readme",
   "dependencies": {
     "@soinlabs/db": "^0.0.6",
     "bcrypt": "^5.0.1",
