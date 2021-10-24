@@ -71,16 +71,27 @@ let Reserva = async (request,res)=>{
 }
 
 let retiroPrestamo = async (req, res) => {
-    const idprestamo = request.params.id;
+    const idprestamo = req.params.id;
     try {
-        const chequeo = await Pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'
+        const chequeo = await pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'
         AND en_reserva=FALSE`);
 
         if (chequeo.rowCount === 0) {
             res.status(404).json('No hay un prestamo con ese id');
         }
         else {
-            res.status(200).json('Si hay un prestamo con ese id')
+            const datos = await pool.query('SELECT serial, cantidad FROM prestamo_inv WHERE prestamo_id=\''+idprestamo+'\';')
+            var resultados_tmp;
+            for (var col of datos.rows) {
+                var serial = col.serial;
+                var cantidad = col.cantidad;
+                resultados_tmp = await pool.query('SELECT disponibles FROM inventario WHERE serial=\''+serial+'\';')
+                var disponibles = resultados_tmp.rows[0].disponibles;
+                resultado = await pool.query('UPDATE inventario SET disponibles=\''+(disponibles+cantidad).toString()+'\' WHERE serial=\''+serial+'\';');
+            }
+            await pool.query('DELETE FROM prestamo_inv WHERE prestamo_id=\''+idprestamo+'\';');
+            await pool.query('DELETE FROM prestamo WHERE prestamo_id=\''+idprestamo+'\';');
+            res.status(200).json('Se actualizo la base de datos eliminando el prestamo')
         }
     }
     catch(error) {
