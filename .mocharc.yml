@@ -1,0 +1,14 @@
+color: true
+diff: true
+exit: true
+full-trace: true
+recursive: true
+parallel: false
+reporter: 'spec'
+retries: 3
+spec:
+  - 'test/**/*.spec.js' # modify here if you only want to run a subset. you can make multiple lines.
+timeout: 140000
+slow: 0
+ui: 'bdd'
+v8-stack-trace-limit: 100
