@@ -1,14 +1,6 @@
-color: true
-diff: true
 exit: true
-full-trace: true
-recursive: true
-parallel: false
-reporter: 'spec'
-retries: 3
+retries: 2
 spec:
-  - 'test/**/*.spec.js' # modify here if you only want to run a subset. you can make multiple lines.
-timeout: 140000
-slow: 0
-ui: 'bdd'
-v8-stack-trace-limit: 100
+  - 'test/paquetes/base_datos/DB_conexion.spec.js' # Deberia correr este test primero
+  - 'test/**/*.spec.js' # Modificar aca si se quiere correr tests especificos, se pueden usar multiples lineas
+timeout: 10000
