@@ -1,27 +1,28 @@
 {
-  "name": "matrix",
+  "name": "@o-lab/backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/api/index.js",
+    "start": "node Olab/servicios/API/index.js",
     "dev": "nodemon Olab/servicios/API/index.js",
-    "test": "env-cmd ./env/test.env jest --watch --runInBand"
+    "test": "mocha -b"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SoinLabs/matrix.git"
+    "url": "git+https://github.com/AndZapCod/O-LAB"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SoinLabs/matrix/issues"
+    "url": "https://github.com/AndZapCod/O-LAB/issues"
   },
-  "homepage": "https://github.com/SoinLabs/matrix#readme",
+  "homepage": "https://github.com/AndZapCod/O-LAB#readme",
   "dependencies": {
     "@soinlabs/db": "^0.0.6",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.1",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "generate-password": "^1.6.1",
     "jsonwebtoken": "^8.5.1",
@@ -37,7 +38,11 @@
     "validator": "^13.6.0"
   },
   "devDependencies": {
+    "assert": "^2.0.0",
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
     "env-cmd": "^10.1.0",
+    "mocha": "^9.1.3",
     "nodemon": "^2.0.13"
   },
   "keywords": [],

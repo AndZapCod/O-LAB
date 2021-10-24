@@ -1,0 +1,6 @@
+exit: true
+retries: 2
+spec:
+  - 'test/paquetes/base_datos/DB_conexion.spec.js' # Deberia correr este test primero
+  - 'test/**/*.spec.js' # Modificar aca si se quiere correr tests especificos, se pueden usar multiples lineas
+timeout: 10000

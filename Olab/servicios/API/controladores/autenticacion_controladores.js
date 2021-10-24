@@ -20,13 +20,15 @@ let login = async(req,res)=>{
     if(consulta1.rowCount===0){
         res.status(404).json('No hay usuario con ese email');
     }
-    const confirmacion = await compararContrasenia(contrasenia,consulta1.rows[0].contrasenia);
-    if(confirmacion){
-        const token = jwtoken.sign({correo: correo}, codigo.SECRETO, 
-            {expiresIn: 86400});
-        res.status(200).json({token});
-    }else{
-        res.status(401).json('Contraseña errada');
+    else {
+        const confirmacion = await compararContrasenia(contrasenia,consulta1.rows[0].contrasenia);
+        if(confirmacion){
+            const token = jwtoken.sign({correo: correo}, codigo.SECRETO, 
+                {expiresIn: 86400});
+            res.status(200).json({token});
+        }else{
+            res.status(401).json('Contraseña errada');
+        }
     }
 }
 
