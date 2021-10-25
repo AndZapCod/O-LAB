@@ -20,6 +20,6 @@ router.get('/reservaxid/:id',[estaLogueado,esAuxiliar],Reserva)
 //ruta para consultar prestamos/reservar de un usuario (cliente-usa token)
 
 //ruta para devolver un prestamo (cliente-usa token)
-router.post('/devolverPrestamo/:id', estaLogueado, retiroPrestamo)
+router.post('/devolverPrestamo/:id', [estaLogueado,esAuxiliar], retiroPrestamo)
 
 module.exports=router;
