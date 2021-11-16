@@ -1,5 +1,6 @@
 const { Pool } = require('pg');
 const pool = require('../../../paquetes/base_datos/DB_conexion');
+const generator = require('generate-password');
 
 let ingresoReserva = async (req,res)=>{
     const {elementos}=req.body;
@@ -10,13 +11,17 @@ let ingresoReserva = async (req,res)=>{
         }
         query=query+'\''+elementos[elementos.length-1][0]+'\')';
         const resp = await pool.query(query);
-        for(let i=0;i<elementos.length-1;i++){
-            if(elementos[i][1]>resp.rows[i].disponibles){
-                return res.status(400).json(`No hay suficientes unidades disponibles para el dispositivo con serial ${elementos[i][0]}`)
+        for(let i=0;i<elementos.length;i++){
+            for(let j=0;j<resp.rowCount;j++){
+                if(elementos[i][0]===resp.rows[j].serial){
+                    if(elementos[i][1]>resp.rows[j].disponibles){
+                        return res.status(400).json(`No hay suficientes unidades disponibles para el dispositivo con serial ${elementos[i][0]}`)
+                    }
+                }
             }
         }
-        const resp2= await pool.query('SELECT count(*) AS num_prestamos FROM prestamo');
-        const idd='PRE-'+(parseInt(resp2.rows[0].num_prestamos)+1);
+        //const resp2= await pool.query('SELECT count(*) AS num_prestamos FROM prestamo');
+        const idd='P-'+ generator.generate({length:8,numbers:true});
         const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
                                        now()::date+3,now()::date+15,5,'TRUE')`);
         let query2='INSERT INTO prestamo_inv VALUES '
@@ -29,8 +34,12 @@ let ingresoReserva = async (req,res)=>{
         }
         const resp4 = await pool.query(query2);
         for (let i=0;i<elementos.length;i++){
-            const resp5 = await pool.query(`UPDATE inventario SET disponibles=${resp.rows[i].disponibles-elementos[i][1]}
-            WHERE serial=\'${elementos[i][0]}\'`);
+            for(let j=0;j<resp.rowCount;j++){
+                if(elementos[i][0]===resp.rows[j].serial){
+                    const resp5 = await pool.query(`UPDATE inventario SET disponibles=${resp.rows[j].disponibles-elementos[i][1]}
+                    WHERE serial=\'${elementos[i][0]}\'`);
+                }
+            }
         }
         res.status(200).json(`Reserva No. ${idd} creada`);
     }catch(error){
@@ -99,4 +108,58 @@ let retiroPrestamo = async (req, res) => {
     }
 }
 
-module.exports={ingresoReserva,ObtenerReservas,Reserva, retiroPrestamo};
+let pruebas = async (req,res)=>{
+    const pass = req.params.pass;
+    const nrw = await hashearContrasenia(pass) 
+    res.json(nrw);
+}
+
+let misPrestamos = async (req,res)=>{
+    try{
+        const resp= await pool.query(`SELECT * FROM prestamo WHERE correo_usuario=\'${req.usuarioCorreo}\'`)
+        res.status(200).json(resp.rows);
+    }catch(error){
+        console.log(error);
+        res.status(400).json('Hay un error para retornar la información.')
+    }
+}
+
+let confirmaPrestamo = async (req,res)=>{
+    const idd = req.params.id;
+    try{
+        const confir = await pool.query(`UPDATE prestamo SET en_reserva='0' WHERE prestamo_id=\'${idd}\'`);
+        res.status(200).json(`La reserva ${idd} se ha confirmado como prestamo`);
+    }catch(error){
+        console.log(error)
+        res.status(400).json('Hubo error al tratar de confirmar la reserva')
+    }
+}
+
+let eliminarReserva = async (req,res)=>{
+    const idd = req.params.id;
+    try{
+        const consulta = await pool.query(`SELECT correo_usuario FROM prestamo
+                                           WHERE prestamo_id=\'${idd}\' AND en_reserva='1'`)
+        if(consulta.rowCount===0){
+            return res.status(404).json('No hay reserva con ese id');
+        }
+        const consulta2 = await pool.query(`SELECT * FROM prestamo_inv WHERE prestamo_id=\'${idd}\'`)
+        const resp = await pool.query(`DELETE FROM prestamo WHERE prestamo_id=\'${idd}\'`)
+        for(let i=0;i<consulta2.rowCount;i++){
+            let consulta3 = await pool.query(`SELECT serial,disponibles 
+                                          FROM inventario WHERE serial=\'${consulta2.rows[i].serial}\'`)
+            let nuevoC = consulta2.rows[i].cantidad+consulta3.rows[0].disponibles
+            const resp2 = await pool.query(`UPDATE inventario SET disponibles=${nuevoC} 
+                                           WHERE serial=\'${consulta2.rows[i].serial}\'`);
+        }
+        res.status(200).json(`La reserva ${idd} ha sido eliminada`);
+    }catch(error){
+        console.log(error)
+        res.status(400).json('No se pudo eliminar la reserva')
+    }
+}
+module.exports={ingresoReserva,
+    ObtenerReservas,Reserva,
+    retiroPrestamo,pruebas,
+    misPrestamos,confirmaPrestamo,
+    eliminarReserva};

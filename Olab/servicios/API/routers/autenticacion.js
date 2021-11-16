@@ -8,6 +8,7 @@ router.post('/login',login )
 
 //Ruta para cambiar contraseña
 router.put('/cambioContrasenia',estaLogueado,cambioC)
+
 //Ruta creacion masiva de usuarios con contraseña generada
 //solo permitida para el administrador
 router.post('/signup',[estaLogueado,esAdministrador],registroU)

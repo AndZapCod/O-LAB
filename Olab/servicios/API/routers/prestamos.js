@@ -1,8 +1,10 @@
 const {Router} = require('express');
 const router = Router();
 const pool = require('../../../paquetes/base_datos/DB_conexion');
-const {ingresoReserva,ObtenerReservas,Reserva, retiroPrestamo}= require('../controladores/prestamos_controladores');
+const {ingresoReserva,ObtenerReservas,Reserva,
+    retiroPrestamo,pruebas,misPrestamos,confirmaPrestamo,eliminarReserva}= require('../controladores/prestamos_controladores');
 const {estaLogueado,esAuxiliar}= require('../middlewares/auth')
+
 //ruta para crear una reserva (cliente)
 router.post('/crearReserva',estaLogueado,ingresoReserva);
 
@@ -13,13 +15,17 @@ router.get('/estadoReservas',[estaLogueado,esAuxiliar],ObtenerReservas)
 router.get('/reservaxid/:id',[estaLogueado,esAuxiliar],Reserva)
 
 //ruta para eliminar una reserva (auxiliar)
-
+router.delete('/eliminarReserva/:id',[estaLogueado,esAuxiliar], eliminarReserva)
 
 //ruta para confirmar una reserva como prestamo (se entregan los elementos) (auxiliar)
+router.put('/confirmarPrestamo/:id',[estaLogueado,esAuxiliar], confirmaPrestamo)
 
 //ruta para consultar prestamos/reservar de un usuario (cliente-usa token)
+router.get('/usuarioPrestamos',estaLogueado, misPrestamos)
 
 //ruta para devolver un prestamo (cliente-usa token)
 router.post('/devolverPrestamo/:id', [estaLogueado,esAuxiliar], retiroPrestamo)
 
+//rutas temporal solo de pruebas (ELIMINAR)
+//router.get('/rutas/:pass',pruebas)
 module.exports=router;

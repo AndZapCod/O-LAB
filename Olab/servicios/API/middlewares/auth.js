@@ -31,7 +31,7 @@ let esAuxiliar = async(req,res,next)=>{
     try{
         const consulta = await pool.query(`SELECT  * FROM usuarios WHERE
         correo=\'${req.usuarioCorreo}\'`);
-        if(consulta.rows[0].rol!=='auxiliar'){
+        if(consulta.rows[0].rol!=='auxiliar' && consulta.rows[0].rol!=='administrador'){
             return res.status(403).json('Lo siento pero no es auxiliar');
         }else{
             next();
