@@ -116,7 +116,8 @@ let pruebas = async (req,res)=>{
 
 let misPrestamos = async (req,res)=>{
     try{
-        const resp= await pool.query(`SELECT * FROM prestamo WHERE correo_usuario=\'${req.usuarioCorreo}\'`)
+        const resp= await pool.query(`SELECT prestamo_id,reserva,entrega,devolucion,
+                                     renovaciones,en_reserva FROM prestamo WHERE correo_usuario=\'${req.usuarioCorreo}\'`)
         res.status(200).json(resp.rows);
     }catch(error){
         console.log(error);
