@@ -254,6 +254,41 @@ Output:
 }
 
 ```
+-**Ruta prestamos activos**: Ruta para obtener todos los prestamos (no reservas) que hay activos. Solicitud *get* que retorna la informacion de todos los prestamos (en_reserva=FALSE). Esta ruta requiere el rol de **auxiliar** o **administrador** y **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+```
+http://IP:3000/prestamos/estadoPrestamos
+
+Input:
+
+NA
+
+Output:
+
+[
+    {
+        "prestamo_id": "PRE-3",
+        "nombre": "Luis Gomez",
+        "posicion": "estudiante",
+        "correo": "luisfgomez@urosario.edu.co",
+        "entrega": "2021-11-13T05:00:00.000Z",
+        "devolucion": "2021-11-28T05:00:00.000Z"
+    },
+    {
+        "prestamo_id": "PRE-2",
+        "nombre": "Luis Gomez",
+        "posicion": "estudiante",
+        "correo": "luisfgomez@urosario.edu.co",
+        "entrega": "2021-10-23T05:00:00.000Z",
+        "devolucion": "2021-11-04T05:00:00.000Z"
+    }
+]
+
+Output error:
+
+{
+    'Error al obtener la información en postgres'
+}
+```
 ## Kits
 
 -**Ruta consultar kits**: Ruta para obtener informacion de los kits disponibles en inventario. Solicitud *get* que retorna un arreglo de objetos JSON con informacion de los kits. La ruta requiere **AUTENTICACION** por lo que el usuario debe loguearse previamente. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
@@ -415,6 +450,268 @@ Output error:
 ```
 ## Politicas
 
+-**Ruta consultar politicas**: Ruta para obtener informacion sobre las categorias (politicas) de prestamos. Solicitud *get* que retorna informacion de cada categoria. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/politicas
+
+Input:
+
+NA
+
+Output:
+
+[
+    {
+        "categoria": "abierta",
+        "horas_reserva": "72",
+        "dias_prestamo": "15",
+        "max_renovaciones": "5"
+    },
+    {
+        "categoria": "restringida",
+        "horas_reserva": "72",
+        "dias_prestamo": "20",
+        "max_renovaciones": "7"
+    },
+    {
+        "categoria": "confidencial",
+        "horas_reserva": "96",
+        "dias_prestamo": "30",
+        "max_renovaciones": "9"
+    }
+]
+
+Output error:
+
+{
+    'Error al obtener la información'
+}
+```
+
+-**Ruta crear categoria**: Ruta para agregar una nueva categoria en las politicas. Solicitud *post* que recibe informacion requerida para crear una categoria. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/politicas/crearCategoria
+
+Input:
+
+{
+    "categoria": "nueva",
+    "horas_reserva": "25",
+    "dias_prestamo": "10",
+    "max_renovaciones": "2"
+}
+
+Output:
+
+{
+    'Categoria creada exitosamente'
+}
+
+Output error:
+
+{
+    'Error en postgres al crear la categoria'
+}
+```
+
+-**Ruta actualizar politicas**: Ruta para cambiar aspectos de las categorias de politicas de prestamos. Solicitud *put* que recibe un arreglo de objetos JSON con las categorias a cambiar. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/politicas/actualizarPoliticas
+
+Input:
+
+[
+    {
+        "categoria": "abierta",
+        "horas_reserva": "3",
+        "dias_prestamo": "10",
+        "max_renovaciones": "2"
+    },
+    {
+        "categoria": "restringida",
+        "horas_reserva": "72",
+        "dias_prestamo": "20",
+        "max_renovaciones": "7"
+    },
+    {
+        "categoria": "confidencial",
+        "horas_reserva": "96",
+        "dias_prestamo": "30",
+        "max_renovaciones": "9"
+    }
+]
+
+Output:
+
+{
+    'Categorias actualizadas exitosamente'
+}
+
+Output error:
+
+{
+    'Error durante actualización de información en postgres'
+}
+```
+
+-**Ruta usuarios por categoria**: Ruta que permite obtener los usuarios de una categoria en particular. Solicitud *get* que recibe como parametro la categoria de la cual se quieren obtener los usuarios. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/politicas/usuarios/<nombre categoria>
+
+Input:
+
+NA
+
+Output:
+
+[
+    {
+        "nombre": "Diego Gonzales",
+        "posicion": "profesor",
+        "accesibilidad": "restringida"
+    },
+    {
+        "nombre": "Alex Caicedo",
+        "posicion": "profesor",
+        "accesibilidad": "restringida"
+    }
+]
+
+Output error:
+
+{
+    'Error al obtener información de postgres'
+}
+```
+
+-**Ruta agregar usuarios**: Ruta para incluir un usuario en una categoria de politicas de prestamo. Solicitud *put* que recibe el correo del usuario a incluir y la categoria donde se va a incluir. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/politicas/agregarUsuario
+
+Input:
+
+{
+    "correo":"andresgutierrez@urosario.edu.co",
+    "categoria":"restringida"
+}
+
+Output:
+
+{
+    'Actualizacion de categoria exitosa'
+}
+
+Output error:
+
+{
+    'Error al actualizar la información en postgres'
+}
+```
+
+-**Ruta eliminar usuarios**: Ruta para sacar a un usuario de una categoria en particular.Solicitud *put* que recibe el correo del usuario a eliminar, esta ruta cambia la categoria del usuario a **abierta** (categoria base). Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/politicas/eliminarUsuario
+
+Input:
+
+{
+    "correo":"andresgutierrez@urosario.edu.co"
+}
+
+Output:
+
+{
+    'Eliminación exitosa'
+}
+
+Output error:
+
+{
+    'Error en postgres al cambiar información'
+}
+
+```
+
 ## Usuarios
+
+-**Ruta consultar auxiliares**: Ruta para obtener todos los usuarios que son auxiliares. Solicitud *get* que retorna informacion de los auxiliares. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+```
+http://IP:3000/usuarios/auxiliares
+
+Input:
+
+NA
+
+Output:
+
+[
+    {
+        "nombre": "Diego Gonzales",
+        "correo": "diegofgonzales@urosario.edu.co",
+        "celular": null,
+        "posicion": "profesor"
+    }
+]
+
+Output error:
+
+{
+    'Error al obtener la información de postgres'
+}
+```
+
+-**Ruta agregar auxiliares**: Ruta para incluir un usuario ya registrado en el rol de auxiliar. Solicitud *put* que recibe el correo del usuario que sera auxiliar. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/usuarios/agregarAuxiliar
+
+Input:
+
+{
+    "correo":"andresgutierrez@urosario.edu.co"
+}
+
+Output:
+
+{
+    'Auxiliar agregado exitosamente'
+}
+
+Output error:
+
+{
+    'Error al cambiar informacion en postgres'
+}
+```
+
+-**Ruta eliminar auxiliares**: Ruta para eliminar un usuario del rol de auxiliar. Solicitud *put* que recibe el correo de un usuario auxiliar y cambia su rol a **cliente** (rol base). Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:3000/usuarios/eliminarAuxiliar
+
+Input:
+
+{
+    "correo":"andresgutierrez@urosario.edu.co"
+}
+
+Output:
+
+{
+    'Auxiliar eliminado exitosamente'
+}
+
+Output error:
+
+{
+    'Error al cambiar informacion en postgres'
+}
+```
 
 ## Inventario (proximamente...)

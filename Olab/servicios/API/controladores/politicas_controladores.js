@@ -41,7 +41,7 @@ let actualizarP = async (req,res)=>{
 let usuariosPol = async (req,res)=>{
     const cat = req.params.categoria;
     try{
-        const consulta = await pool.query(`SELECT CONCAT(nombre,' ',apellido1) nombre,posicion
+        const consulta = await pool.query(`SELECT CONCAT(nombre,' ',apellido1) nombre,posicion,
                                             accesibilidad FROM usuarios 
                                             WHERE accesibilidad=\'${cat}\'`);
         res.status(200).json(consulta.rows);
