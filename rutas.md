@@ -413,5 +413,8 @@ Output error:
     'Error: Fallo en la actualizacion del kit'
 }
 ```
+## Politicas
+
+## Usuarios
 
 ## Inventario (proximamente...)

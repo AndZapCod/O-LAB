@@ -10,7 +10,7 @@ let ingresoReserva = async (req,res)=>{
             query=query+'\''+elementos[i][0]+'\',';
         }
         query=query+'\''+elementos[elementos.length-1][0]+'\')';
-        const resp = await pool.query(query);
+        var resp = await pool.query(query);
         for(let i=0;i<elementos.length;i++){
             for(let j=0;j<resp.rowCount;j++){
                 if(elementos[i][0]===resp.rows[j].serial){
@@ -21,9 +21,28 @@ let ingresoReserva = async (req,res)=>{
             }
         }
         //const resp2= await pool.query('SELECT count(*) AS num_prestamos FROM prestamo');
-        const idd='P-'+ generator.generate({length:8,numbers:true});
-        const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
-                                       now()::date+3,now()::date+15,5,'TRUE')`);
+    }catch(error){
+        console.log(error)
+        res.status(400).json('No fue posible revisar el inventario')
+    }
+    let idd='P-'+ generator.generate({length:8,numbers:true});    
+    try{
+
+        const consulta1 = await pool.query(`SELECT p.* FROM usuarios u JOIN politicas p 
+                                            ON (u.accesibilidad=p.categoria) 
+                                            WHERE u.correo=\'${req.usuarioCorreo}\'`);
+        if (consulta1.rowCount!==0){
+            const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
+            (now() + interval '1 hr'*${consulta1.rows[0].horas_reserva})::date,now()::date+${consulta1.rows[0].dias_prestamo},
+            ${consulta1.rows[0].max_renovaciones},'TRUE')`);
+        }else{
+            return res.status(404).json('No se encontro el usuario')
+        }
+    }catch(error){
+        console.log(error);
+        res.status(400).json('Hay un problema para crear el registro en prestamos');
+    }
+    try{
         let query2='INSERT INTO prestamo_inv VALUES '
         for(let j=0;j<elementos.length;j++){
             if(j!==elementos.length-1){
@@ -33,6 +52,11 @@ let ingresoReserva = async (req,res)=>{
             }
         }
         const resp4 = await pool.query(query2);
+    }catch(error){
+        console.log(error);
+        res.status(400).json('Hay un problema para ingresar datos en prestamos_inv');
+    }
+    try{
         for (let i=0;i<elementos.length;i++){
             for(let j=0;j<resp.rowCount;j++){
                 if(elementos[i][0]===resp.rows[j].serial){
@@ -44,7 +68,7 @@ let ingresoReserva = async (req,res)=>{
         res.status(200).json(`Reserva No. ${idd} creada`);
     }catch(error){
         console.log(error);
-        res.status(400).json('Hay un problema para crear la reserva');
+        res.status(400).json('Hay un problema al cambiar el inventario');
     }
 }
 
@@ -64,12 +88,11 @@ let ObtenerReservas = async (req,res)=>{
 let Reserva = async (request,res)=>{
     const idprestamo = request.params.id;
     try{
-        const chequeo =await pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'
-                                        AND en_reserva=TRUE`);
+        const chequeo =await pool.query(`SELECT * FROM prestamo WHERE prestamo_id=\'${idprestamo}\'`);
         if(chequeo.rowCount===0){
             return res.status(404).json('No hay reserva con ese id')
         }
-        const consulta = await pool.query(`SELECT pi.serial,i.categoria,i.ubicacion,pi.cantidad 
+        const consulta = await pool.query(`SELECT pi.serial,i.nombre AS descripcion,i.categoria,i.ubicacion,pi.cantidad 
                                             FROM prestamo_inv AS pi JOIN inventario AS i 
                                             ON (pi.serial=i.serial) WHERE pi.prestamo_id=\'${idprestamo}\'`);
         res.status(200).json(consulta.rows);
@@ -159,8 +182,22 @@ let eliminarReserva = async (req,res)=>{
         res.status(400).json('No se pudo eliminar la reserva')
     }
 }
+
+let obtenerPrestamos = async (req,res)=>{
+    try{
+        const consulta = await pool.query(`SELECT p.prestamo_id, CONCAT(u.nombre,' ',u.apellido1) nombre,u.posicion,
+                                            u.correo,p.entrega,p.devolucion FROM
+                                            usuarios AS u JOIN prestamo AS p ON (u.correo=p.correo_usuario)
+                                            WHERE p.en_reserva=FALSE`);
+        res.status(200).json(consulta.rows);
+    }catch(error){
+        console.log(error)
+        res.status(400).json('Error al obtener la información en postgres');
+    }
+}
 module.exports={ingresoReserva,
     ObtenerReservas,Reserva,
     retiroPrestamo,pruebas,
     misPrestamos,confirmaPrestamo,
-    eliminarReserva};
+    eliminarReserva,
+    obtenerPrestamos};
