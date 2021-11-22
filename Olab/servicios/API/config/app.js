@@ -1,10 +1,19 @@
 const express = require("express");
 const app = express();
+const cors = require('cors');
 const RouterPres= require('../routers/prestamos');
 const RouterAuth = require('../routers/autenticacion')
 const RouterKits = require('../routers/kits')
 const RouterPoliticas = require('../routers/politicas')
 const RouterUsuarios = require('../routers/usuario')
+
+//Enable front conections
+app.use(
+	cors({
+		origin: "*",
+	})
+);
+
 //settings
 app.set("port", 3000);
 app.set("json spaces", 2);
