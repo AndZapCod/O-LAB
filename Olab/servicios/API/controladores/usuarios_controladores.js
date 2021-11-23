@@ -15,6 +15,10 @@ let auxiliares = async (req,res)=>{
 let agregarA = async (req,res)=>{
     const {correo} = req.body;
     try{
+        const consulta = await pool.query(`SELECT rol FROM usuarios WHERE correo=\'${correo}\'`)
+        if(consulta.rowCount===0){
+            return res.status(404).json('El usuario no esta registrado')
+        }
         const cambio = await pool.query(`UPDATE usuarios SET rol='auxiliar' WHERE
                                         correo=\'${correo}\'`);
         res.status(200).json('Auxiliar agregado exitosamente')
@@ -27,6 +31,10 @@ let agregarA = async (req,res)=>{
 let eliminarA = async (req,res)=>{
     const {correo} = req.body;
     try{
+        const consulta = await pool.query(`SELECT rol FROM usuarios WHERE correo=\'${correo}\'`)
+        if(consulta.rowCount===0){
+            return res.status(404).json('El usuario no esta registrado')
+        }
         const eliminar = await pool.query(`UPDATE usuarios SET rol='cliente' WHERE
                                             correo=\'${correo}\'`);
         res.status(200).json('Auxiliar eliminado exitosamente')
