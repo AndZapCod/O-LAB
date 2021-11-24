@@ -3,7 +3,8 @@ const jwtoken = require('jsonwebtoken')
 const pool = require('../../../paquetes/base_datos/DB_conexion');
 const codigo = require('../config/codigo');
 const generator = require('generate-password');
-
+const fs = require('fs');
+const path = require('path');
 
 let compararContrasenia = async (contraseniaIn,contraseniaG)=>{
     return await bcrypt.compare(contraseniaIn,contraseniaG);
@@ -12,6 +13,21 @@ let compararContrasenia = async (contraseniaIn,contraseniaG)=>{
 let hashearContrasenia = async(contraseniaI)=>{
     const genSalt = await bcrypt.genSalt(10);
     return await bcrypt.hash(contraseniaI,genSalt);
+}
+
+// code taken from: https://stackoverflow.com/questions/17564103/using-javascript-to-download-file-as-a-csv-file/17564369
+//Author: Scott,YouBee
+let JsonToCSV=(JsonArray)=>{
+    const JsonFields=['correo','contraseña'];
+    var csvStr = JsonFields.join(",") + "\n";
+
+    JsonArray.forEach(element => {
+        correo  = element.usuario;
+        contrasenia   = element.contrasenia;
+
+        csvStr += correo + ','  + contrasenia + "\n";
+        })
+        return csvStr;
 }
 
 let login = async(req,res)=>{
@@ -25,7 +41,9 @@ let login = async(req,res)=>{
         if(confirmacion){
             const token = jwtoken.sign({correo: correo}, codigo.SECRETO, 
                 {expiresIn: 86400});
-            res.status(200).json({token});
+            res.status(200).json({token,
+                                "nombre":consulta1.rows[0].nombre+' '+consulta1.rows[0].apellido1,
+                                "rol":consulta1.rows[0].rol});
         }else{
             res.status(401).json('Contraseña errada');
         }
@@ -49,7 +67,15 @@ let registroU = async (req,res)=>{
             resultado.push(objeto)
         }
         const insercion = await pool.query(consulta);
-        res.status(200).json(resultado);
+        let CSv = JsonToCSV(resultado);
+        fs.writeFile(path.join(__dirname,'usuariosOlab.csv'),CSv,'utf8',(error,dat)=>{
+            if(error){
+                console.log(error.message);
+            }else{
+                console.log('write completed');
+                res.download(path.join(__dirname,'usuariosOlab.csv'));
+            }
+        });
     }catch(error){
         console.log(error);
         res.status(400).json('Hay problemas para registrar los usuarios');
