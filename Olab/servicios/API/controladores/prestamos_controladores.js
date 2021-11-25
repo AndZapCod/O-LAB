@@ -205,9 +205,32 @@ let obtenerPrestamos = async (req,res)=>{
         res.status(400).json('Error al obtener la información en postgres');
     }
 }
+
+let Elprestamo = async (req,res)=>{
+    const idd = req.params.id;
+    try{
+        const chequeo = await pool.query(`SELECT correo_usuario FROM prestamo
+                                         WHERE prestamo_id=\'${idd}\' and en_reserva='0'`);
+        if(chequeo.rowCount===0){
+            return res.status(404).json('El prestamo no existe o aun es reserva');
+        }else if (chequeo.rows[0].correo_usuario!==req.usuarioCorreo){
+            return res.status(403).json('No puede ver información de este préstamo');
+        }else{
+            const prestamo = await pool.query(`SELECT pi.serial,i.nombre AS descripcion,i.categoria,i.ubicacion,pi.cantidad 
+                                                FROM prestamo_inv AS pi JOIN inventario AS i 
+                                                ON (pi.serial=i.serial) WHERE pi.prestamo_id=\'${idd}\'`)
+            res.status(200).json(prestamo.rows);
+        }
+    }catch(error){
+        console.log(error)
+        res.status(400).json(`Error al consultar la información de postgres`)
+    }
+}
+
 module.exports={ingresoReserva,
     ObtenerReservas,Reserva,
     retiroPrestamo,pruebas,
     misPrestamos,confirmaPrestamo,
     eliminarReserva,
-    obtenerPrestamos};
+    obtenerPrestamos,
+    Elprestamo};

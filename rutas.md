@@ -314,6 +314,33 @@ Output error:
     'Hay un problema para crear la reserva'
 }
 ```
+-**Ruta consultar detalle de un prestamo**: Ruta que permite consultar en detalle los elementos de un prestamo. Solicitud *get* que recibe como párametro el id del prestamo (no reserva). Esta ruta esta hecha para que el cliente consulte detalle de SUS prestamos (se genere un error si se consultan prestamos que no sean del usuario). Solo requiere **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+
+```
+http://IP:4000/prestamos/prestamoxid/<id prestamo> (P-h5ELk4ej)
+
+Input:
+
+NA
+
+Output:
+
+[
+    {
+        "serial": "abc231",
+        "descripcion": "aparato1",
+        "categoria": "AB",
+        "ubicacion": "estante1",
+        "cantidad": 2
+    }
+]
+
+Output error:
+
+{
+    'Error al consultar la información de postgres'
+}
+```
 
 ## Kits
 

@@ -2,7 +2,8 @@ const {Router} = require('express');
 const router = Router();
 const pool = require('../../../paquetes/base_datos/DB_conexion');
 const {ingresoReserva,ObtenerReservas,Reserva,
-    retiroPrestamo,pruebas,misPrestamos,confirmaPrestamo,eliminarReserva,obtenerPrestamos}= require('../controladores/prestamos_controladores');
+    retiroPrestamo,pruebas,misPrestamos,confirmaPrestamo,eliminarReserva,obtenerPrestamos,
+    Elprestamo}= require('../controladores/prestamos_controladores');
 const {estaLogueado,esAuxiliar, esAdministrador}= require('../middlewares/auth')
 
 //ruta para crear una reserva (cliente)
@@ -31,6 +32,9 @@ router.get('/estadoPrestamos',[estaLogueado,esAuxiliar],obtenerPrestamos)
 
 // ruta para hacer prestamo sin reservar
 router.post('/prestamoSinReserva',[estaLogueado,esAuxiliar],ingresoReserva);
+
+// ruta para que un cliente consulte detalles de su prestamo
+router.get('/prestamoxid/:id',estaLogueado,Elprestamo)
 //rutas temporal solo de pruebas (ELIMINAR)
 //router.get('/rutas/:pass',pruebas)
 module.exports=router;
