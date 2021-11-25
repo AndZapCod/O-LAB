@@ -30,7 +30,7 @@ router.post('/devolverPrestamo/:id', [estaLogueado,esAuxiliar], retiroPrestamo)
 router.get('/estadoPrestamos',[estaLogueado,esAuxiliar],obtenerPrestamos)
 
 // ruta para hacer prestamo sin reservar
-router.post('/prestamoSinReserva',[estaLogueado,esAdministrador],ingresoReserva);
+router.post('/prestamoSinReserva',[estaLogueado,esAuxiliar],ingresoReserva);
 //rutas temporal solo de pruebas (ELIMINAR)
 //router.get('/rutas/:pass',pruebas)
 module.exports=router;

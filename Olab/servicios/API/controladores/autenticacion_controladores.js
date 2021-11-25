@@ -43,7 +43,8 @@ let login = async(req,res)=>{
                 {expiresIn: 86400});
             res.status(200).json({token,
                                 "nombre":consulta1.rows[0].nombre+' '+consulta1.rows[0].apellido1,
-                                "rol":consulta1.rows[0].rol});
+                                "rol":consulta1.rows[0].rol,
+                                "correo":consulta1.rows[0].correo});
         }else{
             res.status(401).json('Contraseña errada');
         }
