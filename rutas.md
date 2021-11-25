@@ -787,4 +787,131 @@ Output error:
 }
 ```
 
-## Inventario (proximamente...)
+## Inventario
+
+-**Ruta consultar inventario**: Ruta para consultar todo el inventario (objetos en la tabla `inventario` que no tengan `tipo=kit`), requiere el rol de **auxiliar o administrador** por tanto requiere de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+```
+http://IP:3000/inventario/consultar
+
+Input:
+
+NA
+
+Output:
+
+[
+  {
+    serial: 'aaaa',
+    placa: null,
+    nombre: 'arduino',
+    ubicacion: null,
+    valor: null,
+    cantidad: 5,
+    unidad: null,
+    disponibles: 3,
+    categoria: null,
+    tipo: 'obj'
+  },
+  {
+    serial: 'aaac',
+    placa: '333',
+    nombre: 'impresora3d',
+    ubicacion: null,
+    valor: null,
+    cantidad: 2,
+    unidad: null,
+    disponibles: 2,
+    categoria: null,
+    tipo: 'obj'
+  }
+]
+
+Output error:
+
+{
+    'Error: No se pudo conectar con la base de datos'
+}
+```
+
+-**Ruta crear objeto**: Ruta para crear un objeto en el inventario, requiere el rol de **auxiliar o administrador** por tanto requiere de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+```
+http://IP:3000/inventario/crear
+
+Input:
+
+{
+    serial:'aaad',
+    nombre:'protoboard',
+    tipo:'obj',
+    cantidad:5,
+}
+
+Output:
+
+{
+    'Se ha creado el objeto en el inventario'
+}
+
+Output error:
+
+Si se intenta crear con un serial a uno ya existente:
+{
+    'Ya existe un objeto con ese serial'
+}
+
+Si se intenta crear con una placa a una ya existente
+{
+    'Ya existe un objeto con esa placa'
+}
+
+Si no se proporciona serial o nombre o tipo o cantidad en el body
+{
+    'Tiene que proporcionarse (un serial | una placa | una cantidad | un tipo)'
+}
+
+Si la cantidad nueva no es positiva:
+{
+    'La cantidad debe ser positiva'
+}
+```
+
+-**Ruta modificar objeto**: Ruta para modificar un objeto en el inventario, requiere el rol de **auxiliar o administrador** por tanto requiere de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+```
+http://IP:3000/inventario/modificar/<serial>
+
+Input:
+
+{
+    cantidad:7,
+    nombre:'protoboard',
+    ubicacion:'centro',
+}
+
+Output:
+
+{
+    'Se ha modificado el objeto en el inventario'
+}
+
+Output error:
+
+Si no se pasa ningun cambio:
+{
+    'No se proporciono ningun cambio'
+}
+
+Si se intenta cambiar a un serial ya existente
+{
+    'Ya existe un objeto con ese serial'
+}
+
+Si se intenta cambiar a una placa ya existente
+{
+    'Ya existe un objeto con esa placa'
+}
+
+Si se intenta cambiar a una cantidad no positiva:
+{
+    'La cantidad debe ser positiva'
+}
+```

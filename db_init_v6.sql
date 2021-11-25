@@ -11,10 +11,7 @@ CREATE TABLE usuarios(
 	celular INTEGER CHECK(celular >= 0),
 	rol VARCHAR(15) NOT NULL,
 	posicion VARCHAR(20),
-	accesibilidad VARCHAR(30),
-	CONSTRAINT usuario_politica FOREIGN KEY(accesibilidad) REFERENCES politicas(categoria)
-	ON UPDATE CASCADE
-	ON DELETE SET NULL
+	accesibilidad VARCHAR(30)
 );
 
 CREATE TABLE inventario(
@@ -23,11 +20,11 @@ CREATE TABLE inventario(
 	nombre VARCHAR(30) NOT NULL,
 	ubicacion VARCHAR(30),
 	valor VARCHAR(20),
-	cantidad REAL CHECK(cantidad >= 0),
+	cantidad REAL CHECK(cantidad >= 0) NOT NULL,
 	unidad varchar(10),
-	disponibles REAL CHECK(disponibles >= 0),
+	disponibles REAL CHECK(disponibles >= 0) NOT NULL,
 	categoria VARCHAR(10),
-	tipo VARCHAR(5)	
+	tipo VARCHAR(5)	NOT NULL
 );
 
 -- columna en_reserva es TRUE ('1') si los elementos aun no se han entregado (esta en reserva)
@@ -40,9 +37,7 @@ CREATE TABLE prestamo(
 	entrega DATE NOT NULL,
 	devolucion DATE NOT NULL,
 	renovaciones SMALLINT NOT NULL CHECK(renovaciones >= 0),
-	en_reserva BOOLEAN NOT NULL,
-	FOREIGN KEY(correo_usuario) REFERENCES usuarios(correo)
-	ON DELETE CASCADE
+	en_reserva BOOLEAN NOT NULL
 );
 
 CREATE TABLE prestamo_inv(
@@ -50,9 +45,7 @@ CREATE TABLE prestamo_inv(
 	serial VARCHAR(20),
 	cantidad REAL CHECK(cantidad >= 0),
 	PRIMARY KEY(prestamo_id, serial),
-	FOREIGN KEY(prestamo_id) REFERENCES prestamo(prestamo_id),
-	FOREIGN KEY(serial) REFERENCES inventario(serial)
-	ON DELETE CASCADE
+	FOREIGN KEY(prestamo_id) REFERENCES prestamo(prestamo_id)
 );
 
 CREATE TABLE kits_inv(
@@ -60,9 +53,7 @@ CREATE TABLE kits_inv(
 	serial VARCHAR(20),
 	cantidad REAL NOT NULL CHECK(cantidad >= 0),	
 	estado varchar(30),
-	PRIMARY KEY(kit_id, serial),
-	FOREIGN KEY(kit_id) REFERENCES inventario(serial),
-	FOREIGN KEY(serial) REFERENCES inventario(serial)
+	PRIMARY KEY(kit_id, serial)
 );
 
 CREATE TABLE politicas(
@@ -71,3 +62,20 @@ CREATE TABLE politicas(
 	dias_prestamo NUMERIC DEFAULT 15,
 	Max_renovaciones NUMERIC DEFAULT 5
 );
+
+ALTER TABLE usuarios
+ADD CONSTRAINT fk_usuario_politica FOREIGN KEY(accesibilidad) REFERENCES politicas(categoria)
+ON UPDATE CASCADE
+ON DELETE SET NULL;
+
+ALTER TABLE prestamo
+ADD FOREIGN KEY(correo_usuario) REFERENCES usuarios(correo)
+ON DELETE CASCADE;
+
+ALTER TABLE prestamo_inv
+ADD FOREIGN KEY(serial) REFERENCES inventario(serial)
+ON DELETE CASCADE;
+
+ALTER TABLE kits_inv
+ADD FOREIGN KEY(kit_id) REFERENCES inventario(serial),
+ADD FOREIGN KEY(serial) REFERENCES inventario(serial);

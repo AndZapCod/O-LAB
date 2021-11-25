@@ -76,7 +76,7 @@ describe('Deberian funcionar todas las rutas de inventario', () => {
             const result = await EjecutarQuery('SELECT * FROM inventario WHERE serial=\'aaad\'');
             expect(result.rowCount).to.equal(1);
         })
-        it('Deberia crear un objeto en la DB con todos los campor', async () => {
+        it('Deberia crear un objeto en la DB con todos los campos', async () => {
             const {err,res} = await chai.request(app)
             .post('/inventario/crear')
             .set('token-acceso', token)
