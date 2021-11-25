@@ -1,7 +1,10 @@
 const {Router} = require('express');
 const router = Router();
-const {auxiliares,agregarA,eliminarA}=require('../controladores/usuarios_controladores');
+const {auxiliares,agregarA,eliminarA,usuarios}=require('../controladores/usuarios_controladores');
 const { estaLogueado, esAdministrador } = require('../middlewares/auth');
+
+//ruta para obtener todos los usuarios registrados
+router.get('/',[estaLogueado,esAdministrador],usuarios)
 
 //ruta obtener auxiliares
 router.get('/auxiliares',[estaLogueado,esAdministrador],auxiliares)

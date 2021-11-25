@@ -17,7 +17,9 @@ input:
 Output:
 
 {
-    token:"XXXXXXXX"
+    "token":"XXXXXXXX",
+    "nombre":"Usuario ejemplo",
+    "rol": "cliente"
 }
 ```
 
@@ -289,6 +291,30 @@ Output error:
     'Error al obtener la información en postgres'
 }
 ```
+-**Ruta crear prestamo sin reserva**: Ruta que permite hacer un prestamo sin pasar primero al estado de reserva. Solicitud *post* que recibe un JSON igual al de la ruta "crear Reserva" pero adicionalmente recibe un atributo llamado "administrador" que debe ser "true". Esta ruta requiere el rol de **administrador** y **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+```
+http://IP:3000/prestamos/prestamoSinReserva
+
+Input:
+
+{
+    "elementos":[["pop321","2"]],
+    "administrador":"true"
+}
+
+Output:
+
+{
+    "Prestamo No. P-RoBAraym creado"
+}
+
+Output error:
+
+{
+    'Hay un problema para crear la reserva'
+}
+```
+
 ## Kits
 
 -**Ruta consultar kits**: Ruta para obtener informacion de los kits disponibles en inventario. Solicitud *get* que retorna un arreglo de objetos JSON con informacion de los kits. La ruta requiere **AUTENTICACION** por lo que el usuario debe loguearse previamente. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
@@ -639,6 +665,53 @@ Output error:
 ```
 
 ## Usuarios
+
+-**Ruta consultar todos usuarios**: Ruta para obtener informacion de todos los usuarios registrados. Solicitud *get* que retorna datos guardados en la base de datos respecto a todos los usuarios. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+```
+http://IP:3000/usuarios
+
+Input:
+
+NA
+
+Output:
+
+[
+    {
+        "correo": "maicoljimenez@urosario.edu.co",
+        "nombre": "Maicol",
+        "apellido1": "Jimenez",
+        "celular": null,
+        "rol": "auxiliar",
+        "posicion": "profesor",
+        "accesibilidad": null
+    },
+    {
+        "correo": "germanobando@urosario.edu.co",
+        "nombre": "German",
+        "apellido1": "Obando",
+        "celular": null,
+        "rol": "administrador",
+        "posicion": "profesor",
+        "accesibilidad": "confidencial"
+    },
+    {
+        "correo": "camiloasalazar@urosario.edu.co",
+        "nombre": "Camilo",
+        "apellido1": "Salazar",
+        "celular": null,
+        "rol": "cliente",
+        "posicion": "estudiante",
+        "accesibilidad": "abierta"
+    }
+]
+
+Output error:
+
+{
+    'Error al consultar la información en postgres'
+}
+```
 
 -**Ruta consultar auxiliares**: Ruta para obtener todos los usuarios que son auxiliares. Solicitud *get* que retorna informacion de los auxiliares. Esta ruta requiere el rol de **administrador** y de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
 ```

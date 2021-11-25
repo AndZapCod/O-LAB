@@ -3,7 +3,7 @@ const pool = require('../../../paquetes/base_datos/DB_conexion');
 const generator = require('generate-password');
 
 let ingresoReserva = async (req,res)=>{
-    const {elementos}=req.body;
+    const {elementos,administrador}=req.body;
     try{
         let query='SELECT serial,disponibles FROM inventario WHERE serial IN (';
         for(let i=0;i<elementos.length-1;i++){
@@ -32,9 +32,15 @@ let ingresoReserva = async (req,res)=>{
                                             ON (u.accesibilidad=p.categoria) 
                                             WHERE u.correo=\'${req.usuarioCorreo}\'`);
         if (consulta1.rowCount!==0){
-            const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
-            (now() + interval '1 hr'*${consulta1.rows[0].horas_reserva})::date,now()::date+${consulta1.rows[0].dias_prestamo},
-            ${consulta1.rows[0].max_renovaciones},'TRUE')`);
+            if(administrador){
+                const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
+                (now() + interval '1 hr'*${consulta1.rows[0].horas_reserva})::date,now()::date+${consulta1.rows[0].dias_prestamo},
+                ${consulta1.rows[0].max_renovaciones},'FALSE')`);
+            }else{
+                const resp3= await pool.query(`INSERT INTO prestamo VALUES (\'${idd}\',\'${req.usuarioCorreo}\',now()::date,
+                (now() + interval '1 hr'*${consulta1.rows[0].horas_reserva})::date,now()::date+${consulta1.rows[0].dias_prestamo},
+                ${consulta1.rows[0].max_renovaciones},'TRUE')`);
+            }
         }else{
             return res.status(404).json('No se encontro el usuario')
         }
@@ -65,7 +71,11 @@ let ingresoReserva = async (req,res)=>{
                 }
             }
         }
-        res.status(200).json(`Reserva No. ${idd} creada`);
+        if(administrador){
+            res.status(200).json(`Prestamo No. ${idd} creado`); 
+        }else{
+            res.status(200).json(`Reserva No. ${idd} creada`);
+        }
     }catch(error){
         console.log(error);
         res.status(400).json('Hay un problema al cambiar el inventario');

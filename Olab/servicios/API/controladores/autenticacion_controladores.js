@@ -53,15 +53,15 @@ let login = async(req,res)=>{
 let registroU = async (req,res)=>{
     resultado = []
     try{
-        let consulta = 'INSERT INTO usuarios (correo,nombre,apellido1,contrasenia,rol,posicion) VALUES (';
+        let consulta = 'INSERT INTO usuarios (correo,nombre,apellido1,contrasenia,rol,posicion,accesibilidad) VALUES (';
         for(let i=0;i<req.body.length;i++){
             const {correo,nombre,apellido1,rol,posicion}=req.body[i]
             const contrasenia = generator.generate({length:10,numbers:true});
             const hashC = await hashearContrasenia(contrasenia);
             if(i!==req.body.length-1){
-                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\',\''+posicion+'\'),('
+                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\',\''+posicion+'\','+'\'abierta\''+'),('
             }else{
-                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\',\''+posicion+'\')'
+                consulta = consulta+'\''+correo+'\',\''+nombre+'\',\''+apellido1+'\',\''+hashC+'\',\''+rol+'\',\''+posicion+'\','+'\'abierta\''+')'
             }
             let objeto = {usuario:correo,contrasenia: contrasenia}
             resultado.push(objeto)

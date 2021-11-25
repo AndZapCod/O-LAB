@@ -44,8 +44,21 @@ let eliminarA = async (req,res)=>{
     }
 }
 
+let usuarios = async (req,res)=>{
+    try{
+        const consulta = await pool.query(`SELECT correo,nombre,apellido1,celular,
+                                            rol,posicion,accesibilidad
+                                            FROM usuarios`);
+        res.status(200).json(consulta.rows);
+    }catch(error){
+        console.log(error)
+        res.status(400).json('Error al consultar la información en postgres')
+    }
+}
+
 module.exports={
     auxiliares,
     agregarA,
-    eliminarA
+    eliminarA,
+    usuarios
 }
