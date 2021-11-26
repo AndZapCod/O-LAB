@@ -18,21 +18,47 @@ describe('Deberian funcionar todas las rutas de inventario', () => {
         await reiniciarDB();
     })
     
+    const token_cliente = jwtoken.sign({correo: 'test1@urosario.edu.co'}, codigo.SECRETO, {expiresIn: "1m"});
     const token = jwtoken.sign({correo: 'test2@urosario.edu.co'}, codigo.SECRETO, {expiresIn: "1m"});
 
-    describe('Deberia funcionar la ruta para consultar el inventario', () => {
+    describe('Deberia funcionar la ruta para consultar el inventario siendo auxiliar', () => {
         it('Deberia devolver todos los objetos del inventario que no tengan tipo \'kit\' si está logueado y es auxiliar o admin', async () => {
             const {err,res} = await chai.request(app)
-            .get('/inventario/consultar')
+            .get('/inventario/consultar_aux')
             .set('token-acceso', token);
             expect(err).to.be.undefined;
             expect(res).to.have.status(200);
             const result = JSON.parse(res.text);
             expect(result).to.containSubset([
                 {
-                    serial:"aaaa"
+                    serial:"aaaa",
+                    cantidad:5,
+                    disponibles:3,
                 }, {
-                    serial:"aaac"
+                    serial:"aaac",
+                    cantidad:2,
+                    disponibles:2,
+                }
+            ])
+            expect(result).to.have.length(2);
+        })
+    })
+
+    describe('Deberia funcionar la ruta para consultar el inventario siendo cliente', () => {
+        it('Deberia devolver todos los objetos del inventario que no tengan tipo \'kit\' si esta logueado, con disponibilidad censurada', async () => {
+            const {err,res} = await chai.request(app)
+            .get('/inventario/consultar')
+            .set('token-acceso', token_cliente);
+            expect(err).to.be.undefined;
+            expect(res).to.have.status(200);
+            const result = JSON.parse(res.text);
+            expect(result).to.containSubset([
+                {
+                    serial:"aaaa",
+                    disponibles:"media",
+                }, {
+                    serial:"aaac",
+                    disponibles:"disponible",
                 }
             ])
             expect(result).to.have.length(2);

@@ -789,9 +789,9 @@ Output error:
 
 ## Inventario
 
--**Ruta consultar inventario**: Ruta para consultar todo el inventario (objetos en la tabla `inventario` que no tengan `tipo=kit`), requiere el rol de **auxiliar o administrador** por tanto requiere de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
+-**Ruta consultar inventario como auxiliar**: Ruta para consultar todo el inventario (objetos en la tabla `inventario` que no tengan `tipo=kit`), requiere el rol de **auxiliar o administrador** por tanto requiere de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**".
 ```
-http://IP:3000/inventario/consultar
+http://IP:3000/inventario/consultar_aux
 
 Input:
 
@@ -821,6 +821,48 @@ Output:
     cantidad: 2,
     unidad: null,
     disponibles: 2,
+    categoria: null,
+    tipo: 'obj'
+  }
+]
+
+Output error:
+
+{
+    'Error: No se pudo conectar con la base de datos'
+}
+```
+
+-**Ruta consultar inventario**: Ruta para consultar todo el inventario (objetos en la tabla `inventario` que no tengan `tipo=kit`), requiere de **AUTENTICACION**. El token se ingresa en la cabecera de la peticion en un campo llamado "**token-acceso**". Si la disponibilidad es menos que FLOOR(0.2*cantidad) devuelve la disponibilidad como string, si la disponibilidad está entre FLOOR(0.2*cantidad) y FLOOR(0.6*cantidad) devuelve 'media' y si la disponibilidad es mayor a FLOOR(0.6*cantidad) devuelve 'disponible'
+```
+http://IP:3000/inventario/consultar
+
+Input:
+
+NA
+
+Output:
+
+[
+  {
+    serial: 'aaaa',
+    placa: null,
+    nombre: 'arduino',
+    ubicacion: null,
+    valor: null,
+    unidad: null,
+    disponibles: 'media',
+    categoria: null,
+    tipo: 'obj'
+  },
+  {
+    serial: 'aaac',
+    placa: '333',
+    nombre: 'impresora3d',
+    ubicacion: null,
+    valor: null,
+    unidad: null,
+    disponibles: 'disponible',
     categoria: null,
     tipo: 'obj'
   }

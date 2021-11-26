@@ -79,3 +79,17 @@ ON DELETE CASCADE;
 ALTER TABLE kits_inv
 ADD FOREIGN KEY(kit_id) REFERENCES inventario(serial),
 ADD FOREIGN KEY(serial) REFERENCES inventario(serial);
+
+CREATE VIEW cliente_inventario AS
+SELECT
+	serial,
+	placa,
+	nombre,
+	ubicacion,
+	valor,
+	unidad,
+	categoria,
+	tipo,
+	CASE WHEN disponibles <= FLOOR(0.2*cantidad) THEN disponibles::TEXT WHEN disponibles <= FLOOR(0.6*cantidad) AND disponibles > FLOOR(0.2*cantidad) THEN 'media' ELSE 'disponible' END AS disponibles
+FROM
+	inventario;

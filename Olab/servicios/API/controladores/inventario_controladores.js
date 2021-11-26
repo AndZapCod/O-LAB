@@ -1,8 +1,20 @@
 const pool = require('../../../paquetes/base_datos/DB_conexion');
 
-let consultarInv = async (req, res) => {
+let consultarInvAux = async (req, res) => {
     try {
         const response = await pool.query('SELECT * FROM inventario WHERE tipo != \'kit\';');
+        res.status(200).json(response.rows);
+        return;
+    }
+    catch (e) {
+        res.status(400).json('Error: No se pudo conectar con la base de datos');
+        return;
+    }
+}
+
+let consultarInv = async (req,res) => {
+    try {
+        const response = await pool.query('SELECT * FROM cliente_inventario WHERE tipo != \'kit\';');
         res.status(200).json(response.rows);
         return;
     }
@@ -222,4 +234,5 @@ module.exports = {
     consultarInv,
     crearObjeto,
     modificarObjeto,
+    consultarInvAux,
 };
